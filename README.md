@@ -19,9 +19,9 @@ This repository contains the code of a [Twilio Flex](https://www.twilio.com/flex
 ## Components
 
 The solution consists of the following components:
-- **Flex (plugin)**: responsible for initiating the streaming of the call audio and displaying the suggested AI-generated responses.
-- **Functions**: act as middleware for interacting with Twilio APIs from Flex, and for obtaining a token for connecting to Twilio Sync.
-- **Programmable Voice**: service for handing calls, and for streaming call audio over websocket.
+- **Twilio Flex (plugin)**: responsible for initiating the streaming of the call audio and displaying the suggested AI-generated responses.
+- **Twilio Functions**: act as middleware for interacting with Twilio APIs from Flex, and for obtaining a token for connecting to Twilio Sync.
+- **Twilio Programmable Voice**: service for handing calls, and for streaming call audio over websocket.
 - **Cloudflare Worker**: used as the websocket destination for call streams. After receiving the audio stream from Twilio, the Worker forwards it to OpenAI over websocket using the Realtime API. The Worker then listens for responses from OpenAI and publishes them to a Twilio Sync stream. The prompt used for generating responses can be updated by setting the `INSTRUCTION` variable in the Worker.
 - **OpenAI**: service for generating response suggestions.
 - **Twilio Sync**: pub/sub service for sending the response suggestions from the Cloudflare Worker to Flex.

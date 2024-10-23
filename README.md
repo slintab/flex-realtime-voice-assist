@@ -1,6 +1,6 @@
 # Twilio Flex: Real-time Voice Assist
 
-This repository contains the code of a [Twilio Flex](https://www.twilio.com/flex) plugin for displaying real-time suggestions for agents during voice calls. The plugin uses the OpenAI [Realtime API](https://openai.com/index/introducing-the-realtime-api/) to provide suggestions to customer questions for aggents in real-time.
+This repository contains the code of a [Twilio Flex](https://www.twilio.com/flex) plugin for displaying real-time suggestions for agents during voice calls. The plugin uses the OpenAI [Realtime API](https://openai.com/index/introducing-the-realtime-api/) to provide suggest responses to customer questions for agents in real-time.
 
 
 ## Table of contents

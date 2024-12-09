@@ -13,9 +13,8 @@ const { createResponse, createError } = require(Runtime.getFunctions()[
 type MyEvent = {
   Token: string;
   TokenResult?: object;
+  action?: string;
   callSid?: string;
-  conferenceSid?: string;
-  taskSid?: string;
 };
 
 type MyContext = {
@@ -25,37 +24,18 @@ type MyContext = {
   getTwilioClient?: () => ITwilio;
 };
 
-async function updateParticipant(
-  client: ITwilio,
-  conferenceSid: string,
-  callSid: string
-) {
-  await client
-    .conferences(conferenceSid)
-    .participants(callSid)
-    .update({ endConferenceOnExit: false });
-}
-
-async function startCallStream(
-  client: ITwilio,
-  taskSid: string,
-  callSid: string,
-  url: string
-) {
-  const twiml = new Twiml.VoiceResponse();
-
-  const start = twiml.start();
-  start.stream({
-    name: callSid,
+async function startCallStream(client: ITwilio, callSid: string, url: string) {
+  await client.calls(callSid).streams.create({
+    name: "assist_" + callSid,
     url: `${url}/ws/${callSid}`,
   });
+}
 
-  const dial = twiml.dial();
-  dial.conference({ endConferenceOnExit: true }, taskSid);
-
-  await client.calls(callSid).update({
-    twiml: twiml.toString(),
-  });
+async function stopCallStream(client: ITwilio, callSid: string) {
+  await client
+    .calls(callSid)
+    .streams("assist_" + callSid)
+    .update({ status: "stopped" });
 }
 
 export const handler: HandlerFn = TokenValidator(async function (
@@ -63,10 +43,10 @@ export const handler: HandlerFn = TokenValidator(async function (
   event: MyEvent,
   callback: Callback
 ) {
-  const { callSid, conferenceSid, taskSid } = event;
+  const { callSid, action } = event;
   const { STREAM_URL, getTwilioClient } = context;
 
-  if (!(callSid && conferenceSid && taskSid)) {
+  if (!(callSid && action)) {
     return createError(new Error("Missing parameters"), 400, callback);
   }
 
@@ -77,11 +57,16 @@ export const handler: HandlerFn = TokenValidator(async function (
   try {
     const twilioClient = getTwilioClient();
 
-    await updateParticipant(twilioClient, conferenceSid, callSid);
-    await startCallStream(twilioClient, taskSid, callSid, STREAM_URL);
+    if (action === "start") {
+      await startCallStream(twilioClient, callSid, STREAM_URL);
+    }
+
+    if (action === "stop") {
+      await stopCallStream(twilioClient, callSid);
+    }
 
     return createResponse({ result: true }, callback);
   } catch (err) {
-    return createError(new Error("Internal error"), 500, callback);
+    return createError(err, 500, callback);
   }
 });

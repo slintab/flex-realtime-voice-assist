@@ -27,18 +27,14 @@ class VoiceAssistService {
     return VoiceAssistService._instance;
   }
 
-  async start(callSid: string, conferenceSid: string, taskSid: string) {
+  async start(callSid: string) {
     const syncStream = await this.sync.getStream("FLEX_ASSIST_" + callSid);
     if (!syncStream) {
       console.error("Failed to fetch sync stream.");
       return;
     }
 
-    const callStream = await this.call.startStream(
-      callSid,
-      conferenceSid,
-      taskSid
-    );
+    const callStream = await this.call.startStream(callSid);
     if (!callStream) {
       console.error("Failed to fetch call stream.");
       return;

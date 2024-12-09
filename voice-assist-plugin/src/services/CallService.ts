@@ -12,13 +12,13 @@ class CallService {
     this.manager = Flex.Manager.getInstance();
   }
 
-  async startStream(callSid: string, conferenceSid: string, taskSid: string) {
+  async startStream(callSid: string) {
     if (!this.url) {
       console.error("Functions URL is not set.");
       return false;
     }
 
-    const url = `${this.url}/start`;
+    const url = `${this.url}/stream`;
     const token =
       this.manager.store.getState()?.flex?.session?.ssoTokenPayload?.token;
 
@@ -28,9 +28,8 @@ class CallService {
     }
 
     const payload = {
+      action: "start",
       callSid,
-      conferenceSid,
-      taskSid,
       Token: token,
     };
 
@@ -48,7 +47,7 @@ class CallService {
       return false;
     }
 
-    const url = `${this.url}/stop`;
+    const url = `${this.url}/stream`;
     const token =
       this.manager.store.getState()?.flex?.session?.ssoTokenPayload?.token;
 
@@ -58,6 +57,7 @@ class CallService {
     }
 
     const payload = {
+      action: "stop",
       callSid,
       Token: token,
     };

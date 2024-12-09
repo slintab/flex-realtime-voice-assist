@@ -23,16 +23,13 @@ const VoiceAssistButton: React.FunctionComponent<VoiceAssistButtonProps> = ({
     toggleVoiceAssist();
     try {
       const callSid = task.attributes.conference?.participants?.customer;
-      const conferenceSid = task.attributes.conference?.sid;
       const taskSid = task.taskSid;
 
-      if (!callSid || !conferenceSid) {
-        throw new Error(`Missing conference from: ${task.taskSid}.`);
+      if (!callSid) {
+        throw new Error(`Missing callSid from: ${taskSid}.`);
       }
       await Actions.invokeAction("StartVoiceAssist", {
         callSid,
-        conferenceSid,
-        taskSid,
       });
     } catch (error) {
       console.error("Error starting voice assist", error);

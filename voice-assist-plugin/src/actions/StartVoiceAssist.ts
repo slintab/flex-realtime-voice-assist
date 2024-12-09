@@ -10,13 +10,9 @@ interface StartVoiceAssistActionPayload {
 const handleStartVoiceAssistAction = async (
   payload: StartVoiceAssistActionPayload
 ) => {
-  const { callSid, conferenceSid, taskSid } = payload;
+  const { callSid } = payload;
 
-  const voiceAssist = await VoiceAssistService.start(
-    callSid,
-    conferenceSid,
-    taskSid
-  );
+  const voiceAssist = await VoiceAssistService.start(callSid);
 
   if (!voiceAssist) {
     throw `Error starting voice assist for: ${callSid}.`;

@@ -17,7 +17,7 @@ const handleStopVoiceAssistAction = async (
 
   Actions.invokeAction("SetComponentState", {
     name: "VoiceAssistTab",
-    state: { isVisible: false },
+    state: { [callSid]: { enabled: false } },
   });
 };
 

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useFlexSelector } from "@twilio/flex-ui";
+import { ITask, useFlexSelector } from "@twilio/flex-ui";
 import { Box, Alert } from "@twilio-paste/core";
 
 import VoiceAssistSuggestion from "./VoiceAssistSuggestion";
@@ -8,6 +8,7 @@ import VoiceAssistService from "../services/VoiceAssistService";
 interface VoiceAssistTabProps {
   label: string;
   uniqueName: string;
+  task?: ITask;
 }
 
 export interface Suggestion {
@@ -23,7 +24,16 @@ interface VoiceAssistResponse {
   };
 }
 
-const VoiceAssistTab: React.FunctionComponent<VoiceAssistTabProps> = () => {
+const VoiceAssistTab: React.FunctionComponent<VoiceAssistTabProps> = (
+  props
+) => {
+  const { task } = props;
+  const callSid = task?.attributes.conference?.participants?.customer;
+
+  if (!callSid) {
+    return null;
+  }
+
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
 
   const addSuggestion = useCallback((suggestion: Suggestion) => {
@@ -33,7 +43,7 @@ const VoiceAssistTab: React.FunctionComponent<VoiceAssistTabProps> = () => {
   const voiceAssistTabState = useFlexSelector(
     (state: any) => state.flex.view.componentViewStates.VoiceAssistTab
   );
-  const isVoiceAssistEnabled = voiceAssistTabState?.isVisible || false;
+  const isVoiceAssistEnabled = voiceAssistTabState?.[callSid]?.enabled || false;
 
   const messageHandler = ({ message }: VoiceAssistResponse) => {
     const parseOpenaiResponse = (response: string) => {
@@ -56,16 +66,12 @@ const VoiceAssistTab: React.FunctionComponent<VoiceAssistTabProps> = () => {
 
   useEffect(() => {
     const subscribe = async () => {
+      setSuggestions([]);
       const results = await VoiceAssistService.getResults();
       results?.on("messagePublished", messageHandler);
     };
 
-    const unsubscribe = async () => {
-      const results = await VoiceAssistService.getResults();
-      results?.removeAllListeners("messagePublished");
-    };
-
-    isVoiceAssistEnabled ? subscribe() : unsubscribe();
+    isVoiceAssistEnabled && subscribe();
   }, [isVoiceAssistEnabled]);
 
   return suggestions.length < 1 ? (

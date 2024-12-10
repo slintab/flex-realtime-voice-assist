@@ -8,7 +8,12 @@ export const registerVoiceAssistComponents = () => {
       key="voice-assist-tab"
       label="Voice Assist"
       uniqueName="VoiceAssistTab"
-    />
+    />,
+    {
+      if: (props: any) =>
+        props.task.taskStatus === "assigned" &&
+        props.task.taskChannelUniqueName === "voice",
+    }
   );
   Flex.CallCanvasActions.Content.add(
     <VoiceAssistButton key="voice-assist-action" />
